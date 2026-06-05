@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ building.name }} - историческое здание{% endblock %}
+
+{% block content %}
+<div class="building-detail">
+    <!-- Кнопка назад -->
+    <p>
+        <a href="{% url 'buildings_list' %}" class="back-link" data-speak="Вернуться к списку зданий">
+            ← Назад к списку
+        </a>
+    </p>
+    
+    <!-- Название здания -->
+    <h1 data-speak="{{ building.name }}">{{ building.name }}</h1>
+    
+    <!-- Основная информация -->
+    <div class="info-grid">
+        <div class="info-item">
+            <strong data-speak="Город: {{ building.get_city_display }}">🏙️ Город:</strong> {{ building.get_city_display }}
+        </div>
+
+        <div class="info-item">
+            <strong data-speak="Год постройки: {{ building.year_built }}">📅 Год постройки:</strong> {{ building.year_built }}
+        </div>
+        
+        {% if building.architect %}
+        <div class="info-item">
+            <strong data-speak="Архитектор: {{ building.architect }}">👷 Архитектор:</strong> {{ building.architect }}
+        </div>
+        {% endif %}
+        
+        <div class="info-item">
+            <strong data-speak="Адрес: {{ building.address }}">📍 Адрес:</strong> {{ building.address }}
+        </div>
+        
+        {% if building.architectural_style %}
+        <div class="info-item">
+            <strong data-speak="Архитектурный стиль: {{ building.architectural_style }}">🏛️ Стиль:</strong> {{ building.architectural_style }}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Полное описание (озвучивается) -->
+    <div class="description-section">
+        <h2 data-speak="Полное описание здания">📖 Описание</h2>
+        <div class="full-description" data-speak="{{ building.full_description }}">
+            {{ building.full_description|linebreaks }}
+        </div>
+        <i>Данный текст был сгенерирован с помощью искусственного интелекта YandexGPT</i>
+    </div>
+
+        <!-- Аудиогид -->
+    {% if building.audio_guide %}
+    <div class="audio-section">
+        <h2 data-speak="Аудиогид">🎧 Аудиогид</h2>
+        <audio controls class="audio-player" data-speak="Нажмите пробел для воспроизведения аудиогида">
+            <source src="{{ building.audio_guide.url }}" type="audio/mpeg">
+            Ваш браузер не поддерживает аудиоплеер
+        </audio>
+        <p class="audio-note" data-speak="Нажмите на кнопку воспроизведения, чтобы прослушать описание здания">
+            ▶️ Нажмите на кнопку воспроизведения, чтобы прослушать описание
+        </p>
+    </div>
+    {% else %}
+    <div class="audio-section">
+        <p data-speak="Аудиогид пока не создан, но скоро появится">🎧 Аудиогид скоро появится</p>
+    </div>
+    {% endif %}
+    
+    <!-- Тактильные особенности (важно для незрячих!) -->
+    {% if building.tactile_features %}
+    <div class="tactile-section">
+        <h2 data-speak="Тактильные особенности. Что можно потрогать">🖐️ Тактильные особенности</h2>
+        <div class="feature-box" data-speak="{{ building.tactile_features }}">
+            {{ building.tactile_features|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Звуковое окружение -->
+    {% if building.sound_features %}
+    <div class="sound-section">
+        <h2 data-speak="Звуковое окружение. Что можно услышать">🔊 Звуковое окружение</h2>
+        <div class="feature-box" data-speak="{{ building.sound_features }}">
+            {{ building.sound_features|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Доступность для МГН -->
+    {% if building.accessibility_notes %}
+    <div class="accessibility-section">
+        <h2 data-speak="Доступность для маломобильных групп населения">♿ Доступность</h2>
+        <div class="feature-box" data-speak="{{ building.accessibility_notes }}">
+            {{ building.accessibility_notes|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- ========== ИЗОБРАЖЕНИЕ + ОПИСАНИЕ ОТ НЕЙРОСЕТИ ========== -->
+    {% if building.main_image %}
+    <div class="image-section">
+        <h2 data-speak="Фотография здания">📸 Фотография</h2>
+        
+        <!-- Само изображение (для слабовидящих) -->
+        <img src="{{ building.main_image.url }}" 
+             alt="{% if building.image_caption %}{{ building.image_caption }}{% else %}{{ building.name }} - фотография здания{% endif %}" 
+             class="building-image">
+        
+        <!-- Блок с описанием изображения от нейросети (озвучивается) -->
+        {% if building.image_caption %}
+        <div class="image-caption-box" data-speak="Описание изображения: {{ building.image_caption }}">
+            <strong>🖼️ Что изображено на фото:</strong>
+            <p>{{ building.image_caption }}</p>
+            <small class="caption-note" data-speak="Это описание сгенерировано нейросетью автоматически">
+                ℹ️ Описание сгенерировано автоматически
+            </small>
+        </div>
+        {% else %}
+        <p class="image-caption" data-speak="Фотография здания без описания">
+            📷 Фотография здания
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Аудиогид 
+    {% if building.audio_guide %}
+    <div class="audio-section">
+        <h2 data-speak="Аудиогид">🎧 Аудиогид</h2>
+        <audio controls class="audio-player" data-speak="Аудиогид. Нажмите пробел для воспроизведения">
+            <source src="{{ building.audio_guide.url }}" type="audio/mpeg">
+            Ваш браузер не поддерживает аудиоплеер
+        </audio>
+    </div>
+    {% endif %}-->
+    
+    <!-- Кто и когда добавил -->
+    <div class="meta-info">
+        <p data-speak="Здание добавлено {{ building.suggested_by }}, {{ building.created_at|date:'d E Y года' }}">
+            📌 Добавил(а): <strong>{{ building.suggested_by }}</strong><br>
+            📅 Дата добавления: {{ building.created_at|date:"d.m.Y" }}
+        </p>
+    </div>
+</div>
+
+<style>
+.building-detail {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: #000;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+.back-link:hover, .back-link:focus {
+    text-decoration: underline;
+}
+
+.info-grid {
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-left: 4px solid #000;
+    margin: 1rem 0;
+}
+
+.info-item {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+h2 {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.feature-box {
+    background-color: #fafafa;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.full-description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+/* Стили для блока с изображением */
+.image-section {
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: #fafafa;
+    border-radius: 12px;
+}
+
+.building-image {
+    max-width: 100%;
+    max-height: 400px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+/* Стиль для описания изображения от нейросети */
+.image-caption-box {
+    background-color: #e8f4fd;
+    padding: 1rem 1.2rem;
+    border-left: 5px solid #0066cc;
+    margin: 1rem 0;
+    border-radius: 8px;
+}
+
+.image-caption-box strong {
+    color: #004499;
+    font-size: 1rem;
+}
+
+.image-caption-box p {
+    margin: 0.5rem 0 0 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #222;
+}
+
+.caption-note {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
+
+.image-caption {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+}
+
+.audio-section {
+    background-color: #e8f0fe;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.audio-player {
+    width: 100%;
+    max-width: 500px;
+}
+
+.meta-info {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ccc;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* Для высококонтрастного режима */
+body.high-contrast-yellow .image-caption-box {
+    background-color: #333;
+    border-left-color: #ffff00;
+    color: #ffff00;
+}
+
+body.high-contrast-yellow .image-caption-box strong,
+body.high-contrast-yellow .image-caption-box p {
+    color: #ffff00;
+}
+
+body.large-text .image-caption-box p {
+    font-size: 1.3rem;
+}
+</style>
+{% endblock %}

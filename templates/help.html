@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Исторические здания - доступный гид{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
+</head>
+<body>
+    <!-- Ссылка для пропуска навигации -->
+    <a href="#main-content" class="skip-link" data-speak="Пропустить навигацию и перейти к содержанию">Перейти к содержанию</a>
+    
+    <!-- Панель доступности -->
+    <div class="accessibility-toolbar" role="toolbar" aria-label="Панель доступности">
+        <span class="visually-hidden">Панель управления доступностью:</span>
+    </div>
+    
+    <!-- ШАПКА САЙТА -->
+    <header class="site-header" role="banner">
+        <nav class="main-nav" role="navigation" aria-label="Основное меню сайта">
+            <a href="{% url 'index' %}" data-speak="Главная страница. Нажмите для перехода на главную">
+                Главная страница
+            </a>
+            <a href="{% url 'buildings_list' %}" data-speak="Исторические здания. Список всех исторических зданий">
+                Исторические здания
+            </a>
+            <a href="{% url 'about' %}" data-speak="О нас. Информация о проекте">
+                О нас
+            </a>
+            <a href="{% url 'help' %}" data-speak="Справка. Инструкция по использованию сайта">
+                Справка
+            </a>
+            <a href="{% url 'suggest_building' %}" data-speak="Предложить здание. Добавить новое здание в базу">
+                Предложить здание
+            </a>
+        </nav>
+    </header>
+    
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main id="main-content" role="main" tabindex="-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <!-- ПОДВАЛ -->
+    <footer class="site-footer" role="contentinfo">
+        <p>Горячая линия: 8-917-720-65-95</p>
+        <p>Email: p.pavlishevskaya.dk@gmail.com</p>
+        <p>Все страницы озвучиваются. Управление с клавиатуры: Tab, Enter, Стрелки</p>
+        <p>© 2026 Гид по историческим зданиям для незрячих</p>
+    </footer>
+    
+    <script src="{% static 'js/speech.js' %}"></script>
+</body>
+</html>

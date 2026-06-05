@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Все исторические здания{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 data-speak="Все исторические здания">Все исторические здания</h1>
+    
+    <div class="city-filters" role="navigation" aria-label="Фильтр по городам">
+        <h2 data-speak="Фильтр по городам">Фильтр по городам:</h2>
+        <div class="filter-buttons">
+            <a href="?city=all" class="filter-btn {% if current_city == 'all' %}active{% endif %}" 
+               data-speak="Показать все здания, всего {{ city_stats.all }}">
+                Все города ({{ city_stats.all }})
+            </a>
+            <a href="?city=msk" class="filter-btn {% if current_city == 'msk' %}active{% endif %}" 
+               data-speak="Москва, {{ city_stats.msk }} зданий">
+                Москва ({{ city_stats.msk }})
+            </a>
+            <a href="?city=spb" class="filter-btn {% if current_city == 'spb' %}active{% endif %}" 
+               data-speak="Санкт-Петербург, {{ city_stats.spb }} зданий">
+                Санкт-Петербург ({{ city_stats.spb }})
+            </a>
+            <a href="?city=vlg" class="filter-btn {% if current_city == 'vlg' %}active{% endif %}" 
+               data-speak="Волгоград, {{ city_stats.vlg }} зданий">
+                Волгоград ({{ city_stats.vlg }})
+            </a>
+            <a href="?city=other" class="filter-btn {% if current_city == 'other' %}active{% endif %}" 
+               data-speak="Другие города, {{ city_stats.other }} зданий">
+                Другие города ({{ city_stats.other }})
+            </a>
+        </div>
+    </div>
+    
+    <!-- Результаты фильтрации -->
+    <div class="filter-info" data-speak="Показано зданий: {{ total_count }}">
+        Показано зданий: <strong>{{ total_count }}</strong>
+    </div>
+    
+    {% if page_obj %}
+        <div class="buildings-grid">
+            {% for building in page_obj %}
+                <div class="building-card" 
+                     data-speak="{{ building.name }}, город {{ building.get_city_display }}, добавлено {{ building.created_at|date:'d.m.Y' }}">
+                    <h2>{{ building.name }}</h2>
+                    <p><strong>🏙️ Город:</strong> {{ building.get_city_display }}</p>
+                    <p><strong>📅 Год постройки:</strong> {{ building.year_built }}</p>
+                    <p><strong>📍 Адрес:</strong> {{ building.address|truncatewords:10 }}</p>
+                    <p><strong>👤 Добавил:</strong> {{ building.suggested_by }}</p>
+                    <p>{{ building.short_description|truncatewords:20 }}</p>
+                    <a href="{% url 'building_detail' building.id %}" class="read-more" 
+                       data-speak="Подробнее о {{ building.name }}">
+                        Подробнее →
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Пагинация -->
+        {% if page_obj.has_other_pages %}
+            <div class="pagination" role="navigation" aria-label="Навигация по страницам">
+                {% if page_obj.has_previous %}
+                    <a href="?city={{ current_city }}&page=1" data-speak="Первая страница">« Первая</a>
+                    <a href="?city={{ current_city }}&page={{ page_obj.previous_page_number }}" 
+                       data-speak="Предыдущая страница">‹ Назад</a>
+                {% endif %}
+                
+                <span class="current-page" 
+                      data-speak="Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?city={{ current_city }}&page={{ page_obj.next_page_number }}" 
+                       data-speak="Следующая страница">Вперед ›</a>
+                    <a href="?city={{ current_city }}&page={{ page_obj.paginator.num_pages }}" 
+                       data-speak="Последняя страница">Последняя »</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state" data-speak="В этой категории пока нет зданий. Вы можете предложить первое!">
+            <p>В этой категории пока нет зданий.</p>
+            <p><a href="{% url 'suggest_building' %}">Предложить здание</a></p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* Стили для фильтра */
+.city-filters {
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+}
+
+.city-filters h2 {
+    font-size: 1.2rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-btn {
+    display: inline-block;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border: 2px solid #000000;
+    border-radius: 25px;
+    font-weight: normal;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover,
+.filter-btn:focus {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.filter-btn.active {
+    background-color: #000000;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.filter-info {
+    margin: 1rem 0;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.2rem;
+}
+
+/* Адаптация под высокий контраст */
+body.high-contrast-yellow .filter-btn {
+    border-color: #ffff00;
+    background-color: #000000;
+    color: #ffff00;
+}
+
+body.high-contrast-yellow .filter-btn.active {
+    background-color: #ffff00;
+    color: #000000;
+}
+
+body.high-contrast-yellow .city-filters {
+    background-color: #222222;
+}
+</style>
+{% endblock %}

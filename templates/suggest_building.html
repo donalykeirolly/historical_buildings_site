@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Предложить здание{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 data-speak="Предложить новое историческое здание">✏️ Предложить новое здание</h1>
+    
+    <div class="info-block" data-speak="Помогите нам пополнить базу. Заполните форму ниже. Все предложения проходят модерацию.">
+        <p>Помогите нам пополнить базу интересными зданиями!</p>
+        <p>📌 После проверки модератором здание появится на сайте.</p>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message" role="alert" data-speak="{{ message }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post" class="suggestion-form">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" data-speak="{{ field.label }}">
+                    {{ field.label }}
+                    {% if field.field.required %}
+                        <span class="required-star">*</span>
+                    {% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="error-message" role="alert">
+                        {% for error in field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="submit-btn" data-speak="Отправить предложение">
+            📤 Отправить предложение
+        </button>
+    </form>
+</div>
+
+<style>
+.info-block {
+    background-color: #e8f4f8;
+    padding: 1rem;
+    border-left: 4px solid #000;
+    margin: 1rem 0;
+}
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+.required-star {
+    color: red;
+}
+.help-text {
+    display: block;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+.error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+</style>
+{% endblock %}
